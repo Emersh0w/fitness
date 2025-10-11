@@ -1,15 +1,173 @@
+import 'package:fitness/models/category_model.dart';
+import 'package:fitness/models/diet_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<CategoryModel> categories = [];
+  List<DietModel> diets = [];
+
+  void _getInitialInfo() {
+    categories = CategoryModel.getCategories();
+    diets = DietModel.getDiets();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _getInitialInfo();
     return Scaffold(
       appBar: appBar(),
       backgroundColor: Colors.white,
-      body: Column(children: [_search()]),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _search(),
+          SizedBox(height: 48),
+          _categoriesSection(),
+          SizedBox(height: 48),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Text(
+                  'Recommendation\nfor Diet',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Container(
+                color: Colors.white,
+                height: 256,
+                child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: 208,
+                      decoration: BoxDecoration(
+                        color: diets[index].boxColor.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SvgPicture.asset(diets[index].iconPath),
+                          Text(
+                            diets[index].name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            diets[index].level +
+                                ' | ' +
+                                diets[index].calorie +
+                                ' | ' +
+                                diets[index].duration,
+                            style: TextStyle(
+                              color: Color(0xff7B6F72),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+
+                          Container(
+                            height: 48,
+                            width: 128,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xff9DCEFF), Color(0xff92A3FD)],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) => SizedBox(width: 24),
+                  itemCount: diets.length,
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.only(left: 24, right: 24),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Column _categoriesSection() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 24),
+          child: Text(
+            'Category',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+        Container(
+          height: 128,
+          color: Colors.white,
+          child: ListView.separated(
+            itemCount: categories.length,
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 24),
+            itemBuilder: (context, index) {
+              return Container(
+                width: 96,
+                decoration: BoxDecoration(
+                  color: categories[index].boxColor.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SvgPicture.asset(categories[index].iconPath),
+                      ),
+                    ),
+                    Text(
+                      categories[index].name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -29,14 +187,14 @@ class HomePage extends StatelessWidget {
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsets.all(15),
+          contentPadding: EdgeInsets.all(16),
           hintText: 'Search Pancake',
           hintStyle: TextStyle(color: Color(0xffDDDADA), fontSize: 16),
           prefixIcon: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset('assets/icons/Search.svg'),
           ),
-          suffixIcon: Container(
+          suffixIcon: SizedBox(
             width: 96,
             child: IntrinsicHeight(
               child: Row(
@@ -57,7 +215,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide.none,
           ),
         ),
